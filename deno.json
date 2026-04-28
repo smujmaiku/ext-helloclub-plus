@@ -1,0 +1,23 @@
+{
+	"compilerOptions": {
+		"lib": [
+			"deno.window",
+			"deno.unstable",
+			"dom",
+			"node"
+		]
+	},
+	"nodeModulesDir": "auto",
+	"tasks": {
+		"dev": "deno run -A npm:vite build --watch",
+		"build": "deno run -A npm:vite build"
+	},
+	"imports": {
+		"vite": "npm:vite@^6",
+		"vite-plugin-web-extension": "npm:vite-plugin-web-extension@^4"
+	},
+	"fmt": {
+		"useTabs": true,
+		"singleQuote": true
+	}
+}

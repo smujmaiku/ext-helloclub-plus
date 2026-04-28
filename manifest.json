@@ -1,0 +1,29 @@
+{
+	"manifest_version": 3,
+	"name": "HellClub Plus",
+	"version": "0.1.0",
+	"description": "Enhanced admin features for HelloClub",
+	"content_scripts": [
+		{
+			"matches": [
+				"https://*.helloclub.com/*"
+			],
+			"exclude_matches": [
+				"https://auth.helloclub.com/*",
+				"https://signup.helloclub.com/*",
+				"https://help.helloclub.com/*",
+				"https://www.helloclub.com/*",
+				"https://api.helloclub.com/*",
+				"https://api-v2.helloclub.com/*",
+				"https://helloclub.com/*"
+			],
+			"js": [
+				"content.ts"
+			],
+			"run_at": "document_idle"
+		}
+	],
+	"host_permissions": [
+		"https://api-v2.helloclub.com/*"
+	]
+}
