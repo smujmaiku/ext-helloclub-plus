@@ -1,5 +1,9 @@
+import { fetchOrg, getOrg } from './src/services/api.ts';
+
 async function main(): Promise<void> {
-	console.log('yo');
+	await fetchOrg(false);
+	const { name } = getOrg();
+	console.log(`HelloClub Plus: ${name}`);
 }
 
 const _pushState = history.pushState.bind(history);

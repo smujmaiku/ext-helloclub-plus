@@ -8,6 +8,8 @@ let orgConfig: OrgConfig | null = null;
 export interface OrgConfig {
 	id: string;
 	identifier: string;
+	name: string;
+	shortName: string;
 	subdomain: string;
 	timezone: string;
 	type: string;
