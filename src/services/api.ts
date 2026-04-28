@@ -15,6 +15,14 @@ export interface OrgConfig {
 	type: string;
 }
 
+interface CheckInLog {
+	wasCheckedIn: boolean;
+}
+
+interface CheckInLogsResponse {
+	checkInLogs: CheckInLog[];
+}
+
 function apiHeadersMin() {
 	const token = getToken();
 	const { hostname } = document.location;
@@ -57,4 +65,42 @@ export async function fetchOrg(force = false): Promise<OrgConfig> {
 	orgConfig = await res.json();
 
 	return getOrg();
+}
+
+export async function fetchCheckedIn(
+	profileId: string,
+): Promise<boolean> {
+	const toDate = new Date();
+	const fromDate = new Date(toDate);
+	fromDate.setDate(fromDate.getDate() - 10);
+
+	const params = new URLSearchParams({
+		profile: profileId,
+		limit: '1',
+		fromDate: fromDate.toJSON(),
+		toDate: toDate.toJSON(),
+	});
+
+	const res = await fetch(`${API}/checkInLogs?${params}`, {
+		headers: apiHeaders(),
+	});
+	if (!res.ok) return false;
+	const { checkInLogs }: CheckInLogsResponse = await res.json();
+	return checkInLogs?.[0]?.wasCheckedIn === true;
+}
+
+export async function postCheckOut(
+	profileId: string,
+): Promise<boolean> {
+	const res = await fetch(`${API}/checkInLogs`, {
+		method: 'POST',
+		headers: apiHeaders({ 'Content-Type': 'application/json' }),
+		body: JSON.stringify({
+			profileId,
+			reason: 'Manual check-out',
+			type: 'front-desk',
+			wasCheckedIn: false,
+		}),
+	});
+	return res.ok;
 }
