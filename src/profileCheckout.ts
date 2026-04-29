@@ -97,5 +97,6 @@ export function initProfileCheckout(): () => void {
 
 	return () => {
 		observer.disconnect();
+		cleanup();
 	};
 }
