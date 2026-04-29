@@ -5,7 +5,9 @@
 			"deno.unstable",
 			"dom",
 			"node"
-		]
+		],
+		"jsx": "react-jsx",
+		"jsxImportSource": "preact"
 	},
 	"nodeModulesDir": "auto",
 	"tasks": {
