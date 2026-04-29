@@ -10,4 +10,8 @@ export default defineConfig({
 	build: {
 		outDir: 'helloclub-plus',
 	},
+	esbuild: {
+		jsx: 'automatic',
+		jsxImportSource: 'preact',
+	},
 });
