@@ -20,6 +20,8 @@ export function Sidebar({ anchor }: Sidebar.Props) {
 	const [members, setMembers] = useState<fetchCheckedIn.CheckInLog[]>([]);
 	const [loading, setLoading] = useState(false);
 
+	const { subdomain } = getOrg();
+
 	async function refresh() {
 		setLoading(true);
 		try {
@@ -100,7 +102,7 @@ export function Sidebar({ anchor }: Sidebar.Props) {
 									>
 										<td style={{ padding: '6px 0' }}>
 											<a
-												href={`https://${getOrg().subdomain}.helloclub.com/admin/people/members/edit/${log.profile.id}`}
+												href={`https://${subdomain}.helloclub.com/admin/people/members/edit/${log.profile.id}`}
 												rel='noreferrer'
 											>
 												{log.profile.name}

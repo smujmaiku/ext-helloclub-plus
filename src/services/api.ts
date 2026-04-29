@@ -59,7 +59,7 @@ export async function fetchOrg(force = false): Promise<OrgConfig> {
 	return getOrg();
 }
 
-namespace fetchCheckedIn {
+export namespace fetchCheckedIn {
 	export interface CheckInLog {
 		wasCheckedIn: boolean;
 		date: string;
