@@ -1,5 +1,5 @@
 import { delay } from '@std/async';
-import { fetchCheckedIn, postCheckOut } from './services/api.ts';
+import { fetchProfileCheckedIn, postCheckOut } from './services/api.ts';
 
 const TARGET_JQ = '[tooltip="Check member in"]';
 const CHECKOUT_ID = 'hello-plus-checkout-btn';
@@ -27,7 +27,7 @@ async function mountCheckout(anchor: HTMLElement): Promise<void> {
 	};
 
 	// Check if we need the button at all
-	const checkedIn = await fetchCheckedIn(profileId).catch(() => false);
+	const checkedIn = await fetchProfileCheckedIn(profileId).catch(() => false);
 	if (!checkedIn || ctrl.signal.aborted) return;
 
 	anchor.style.color = 'green';

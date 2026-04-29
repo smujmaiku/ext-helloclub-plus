@@ -15,14 +15,6 @@ export interface OrgConfig {
 	type: string;
 }
 
-interface CheckInLog {
-	wasCheckedIn: boolean;
-}
-
-interface CheckInLogsResponse {
-	checkInLogs: CheckInLog[];
-}
-
 function apiHeadersMin() {
 	const token = getToken();
 	const { hostname } = document.location;
@@ -67,7 +59,50 @@ export async function fetchOrg(force = false): Promise<OrgConfig> {
 	return getOrg();
 }
 
-export async function fetchCheckedIn(
+namespace fetchCheckedIn {
+	export interface CheckInLog {
+		wasCheckedIn: boolean;
+		date: string;
+		profile: {
+			id: string;
+			name: string;
+		};
+	}
+
+	export interface Response {
+		checkInLogs: CheckInLog[];
+	}
+}
+
+export async function fetchCheckedIn(): Promise<fetchCheckedIn.CheckInLog[]> {
+	const toDate = new Date();
+	const fromDate = new Date(toDate);
+	fromDate.setDate(fromDate.getDate() - 10);
+
+	const params = new URLSearchParams({
+		fromDate: fromDate.toJSON(),
+		toDate: toDate.toJSON(),
+	});
+
+	const res = await fetch(`${API}/checkInLogs?${params}`, {
+		headers: apiHeaders(),
+	});
+	if (!res.ok) return [];
+	const { checkInLogs }: fetchCheckedIn.Response = await res.json();
+
+	const activity: Record<string, fetchCheckedIn.CheckInLog> = {};
+
+	for (const log of checkInLogs) {
+		const { id } = log.profile;
+		const existing = activity[id];
+		if (existing && existing.date > log.date) continue;
+		activity[id] = log;
+	}
+
+	return Object.values(activity).sort((a, b) => a.date < b.date ? 1 : -1);
+}
+
+export async function fetchProfileCheckedIn(
 	profileId: string,
 ): Promise<boolean> {
 	const toDate = new Date();
@@ -85,7 +120,7 @@ export async function fetchCheckedIn(
 		headers: apiHeaders(),
 	});
 	if (!res.ok) return false;
-	const { checkInLogs }: CheckInLogsResponse = await res.json();
+	const { checkInLogs }: fetchCheckedIn.Response = await res.json();
 	return checkInLogs?.[0]?.wasCheckedIn === true;
 }
 
