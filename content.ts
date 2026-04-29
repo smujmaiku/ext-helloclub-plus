@@ -1,5 +1,6 @@
 import { fetchOrg, getOrg } from './src/services/api.ts';
 import { initProfileCheckout } from './src/profileCheckout.ts';
+import { initSidebar } from './src/sidebar.ts';
 
 async function main(): Promise<void> {
 	await fetchOrg(false);
@@ -7,6 +8,7 @@ async function main(): Promise<void> {
 	console.log(`HelloClub Plus: ${name}`);
 
 	initProfileCheckout();
+	initSidebar();
 }
 
 main();
