@@ -8,6 +8,6 @@ export default defineConfig({
 		deno(),
 	],
 	build: {
-		outDir: 'dist',
+		outDir: 'helloclub-plus',
 	},
 });
