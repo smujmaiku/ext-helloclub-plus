@@ -1,5 +1,10 @@
 import { delay } from '@std/async';
+import pMemoize from 'p-memoize';
 import { fetchProfileCheckedIn, postCheckOut } from './services/api.ts';
+
+const fetchProfileCheckedInMemo = pMemoize(fetchProfileCheckedIn, {
+	maxAge: 1000,
+});
 
 const TARGET_JQ = '[tooltip="Check member in"]';
 const CHECKOUT_ID = 'hello-plus-checkout-btn';
@@ -27,7 +32,8 @@ async function mountCheckout(anchor: HTMLElement): Promise<void> {
 	};
 
 	// Check if we need the button at all
-	const checkedIn = await fetchProfileCheckedIn(profileId).catch(() => false);
+	const checkedIn = await fetchProfileCheckedInMemo(profileId)
+		.catch(() => false);
 	if (!checkedIn || ctrl.signal.aborted) return;
 
 	anchor.style.color = 'green';
