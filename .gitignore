@@ -1,0 +1,7 @@
+# build
+/helloclub-plus/
+/helloclub-plus.zip
+
+# trash
+node_modules/
+.DS_Store

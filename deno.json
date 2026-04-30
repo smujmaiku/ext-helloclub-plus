@@ -1,0 +1,33 @@
+{
+	"compilerOptions": {
+		"lib": [
+			"deno.window",
+			"deno.unstable",
+			"dom",
+			"node"
+		],
+		"jsx": "react-jsx",
+		"jsxImportSource": "preact"
+	},
+	"nodeModulesDir": "auto",
+	"tasks": {
+		"dev": "deno run -A npm:vite build --watch",
+		"build": "deno run -A npm:vite build",
+		"zip": {
+			"command": "cd helloclub-plus && zip -r ../helloclub-plus.zip .",
+			"dependencies": ["build"]
+		}
+	},
+	"imports": {
+		"@deno/vite-plugin": "npm:@deno/vite-plugin@^2.0.2",
+		"@std/async": "jsr:@std/async@^1.3.0",
+		"p-memoize": "npm:p-memoize@^8.0.0",
+		"preact": "npm:preact@^10",
+		"vite": "npm:vite@^6",
+		"vite-plugin-web-extension": "npm:vite-plugin-web-extension@^4"
+	},
+	"fmt": {
+		"useTabs": true,
+		"singleQuote": true
+	}
+}
