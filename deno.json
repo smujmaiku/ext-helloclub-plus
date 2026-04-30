@@ -12,7 +12,11 @@
 	"nodeModulesDir": "auto",
 	"tasks": {
 		"dev": "deno run -A npm:vite build --watch",
-		"build": "deno run -A npm:vite build"
+		"build": "deno run -A npm:vite build",
+		"zip": {
+			"command": "cd helloclub-plus && zip -r ../helloclub-plus.zip .",
+			"dependencies": ["build"]
+		}
 	},
 	"imports": {
 		"@deno/vite-plugin": "npm:@deno/vite-plugin@^2.0.2",
