@@ -26,6 +26,9 @@
 			"run_at": "document_idle"
 		}
 	],
+	"permissions": [
+		"offscreen"
+	],
 	"host_permissions": [
 		"https://api-v2.helloclub.com/*"
 	]
