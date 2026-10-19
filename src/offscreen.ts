@@ -1,6 +1,6 @@
 import { type DataConnection, Peer } from 'peerjs';
 
-const RECONN_MS = 10_000;
+const RECONN_MS = 20_000;
 
 let peer = new Peer();
 let conn: DataConnection | null = null;
@@ -8,34 +8,46 @@ let conn: DataConnection | null = null;
 // pid via hash
 const pid = decodeURIComponent(location.hash.slice(1));
 
-const connCtrl = new AbortController();
+let connCtrl = new AbortController();
 function openPeer() {
-	const tconn = conn = peer.connect(pid, { reliable: true });
+	connCtrl.abort();
+	connCtrl = new AbortController();
+
+	console.log('openPeer', pid);
+	const tconn = peer.connect(pid, {
+		serialization: 'raw',
+		// reliable: true,
+	});
+	conn = tconn;
 	if (!tconn) return;
 
 	const handlePeerOpen = () => {
+		console.log('peer open');
 		chrome.runtime.sendMessage({ type: 'PEER_OPEN' });
 	};
 	const handlePeerData = (data: unknown) => {
+		console.log(data);
 		chrome.runtime.sendMessage({ type: 'PEER_DATA', payload: data });
 	};
 	const handlePeerClose = () => {
 		chrome.runtime.sendMessage({ type: 'PEER_CLOSE' });
 	};
-	const handlePeerError = () => {
-		chrome.runtime.sendMessage({ type: 'PEER_ERROR' });
+	const handlePeerError = (error: Error) => {
+		console.log(error);
+		chrome.runtime.sendMessage({ type: 'PEER_ERROR', payload: error?.message });
 	};
 	tconn.on('open', handlePeerOpen);
 	tconn.on('data', handlePeerData);
-	tconn.on('error', handlePeerClose);
-	tconn.on('close', handlePeerError);
+	tconn.on('close', handlePeerClose);
+	tconn.on('error', handlePeerError);
 
 	connCtrl.signal.addEventListener('abort', () => {
 		if (!tconn) return;
 		tconn.off('open', handlePeerOpen);
 		tconn.off('data', handlePeerData);
-		tconn.off('error', handlePeerClose);
-		tconn.off('close', handlePeerError);
+		tconn.off('close', handlePeerClose);
+		tconn.off('error', handlePeerError);
+		tconn.close();
 	});
 }
 
@@ -56,10 +68,14 @@ peer.on('error', handleError);
 
 setInterval(() => {
 	if (!peer.open) {
+		console.log('upkeep: disconnected');
 		chrome.runtime.sendMessage({ type: 'DISCONNECTED' });
 		peer.reconnect();
 	} else if (!conn?.open) {
+		console.log('upkeep: peer closed');
 		chrome.runtime.sendMessage({ type: 'PEER_CLOSE' });
 		openPeer();
+	} else {
+		chrome.runtime.sendMessage({ type: 'PEER_OPEN' });
 	}
 }, RECONN_MS);
