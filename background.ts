@@ -3,14 +3,14 @@ const OFFSCREEN_PATH = 'offscreen.html';
 const SCAN_EXPIRE_MS = 90_000;
 
 let status: 'PEER' | 'OPEN' | 'CLOSED' = 'CLOSED';
-let scan: string | undefined = undefined;
+let scanValue: string | undefined = undefined;
 let scanExpire = 0;
 let scanTimer: NodeJS.Timeout;
 
 function updateIcon() {
 	const now = Date.now();
 
-	if (scan) {
+	if (scanValue) {
 		chrome.action.setBadgeText({ text: '🪪' });
 		chrome.action.setBadgeBackgroundColor({
 			color: now % 200 < 100 ? '#C34' : '#E32',
@@ -36,7 +36,7 @@ function updateIcon() {
 function setScan(value: string) {
 	clearInterval(scanTimer);
 	scanExpire = Date.now() + SCAN_EXPIRE_MS;
-	scan = value;
+	scanValue = value;
 	scanTimer = setInterval(() => {
 		if (Date.now() > scanExpire) {
 			clearScan();
@@ -49,7 +49,7 @@ function setScan(value: string) {
 function clearScan() {
 	clearInterval(scanTimer);
 	scanExpire = 0;
-	scan = undefined;
+	scanValue = undefined;
 	updateIcon();
 }
 
@@ -69,7 +69,7 @@ async function mountOffscreen(): Promise<void> {
 	await chrome.offscreen.createDocument({
 		url: offPath,
 		reasons: [chrome.offscreen.Reason.WEB_RTC],
-		justification: 'Connecting to optional scan scanner',
+		justification: 'Connecting to optional scanValue scanner',
 	});
 }
 
@@ -78,7 +78,7 @@ async function handlePeerData(data: unknown): Promise<void> {
 	console.log(type, payload);
 
 	switch (type) {
-		case 'scan':
+		case 'scanValue':
 			setScan(payload);
 		default:
 	}
@@ -107,6 +107,19 @@ chrome.runtime.onMessage.addListener((data, sender) => {
 	}
 
 	updateIcon();
+});
+
+chrome.action.onClicked.addListener((tab) => {
+	if (!tab.id || !tab.url || !scanValue) return;
+	const url = new URL(tab.url);
+
+	const validHost = url.hostname.endsWith('.helloclub.com') &&
+		!['www', 'auth'].includes(url.hostname.slice(0, -'.helloclub.com'.length));
+	if (!validHost) return;
+
+	chrome.tabs.update(tab.id, {
+		url: `https://lmn.helloclub.com/admin/people/members?_q=${scanValue}`,
+	});
 });
 
 chrome.runtime.onStartup.addListener(() => {

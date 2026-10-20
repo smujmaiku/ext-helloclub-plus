@@ -1,5 +1,6 @@
 import { fetchOrg, getOrg } from './src/services/api.ts';
 import { initProfileCheckout } from './src/profileCheckout.ts';
+import { initSearchField } from './src/searchField.ts';
 import { initSidebar } from './src/sidebar.ts';
 
 async function main(): Promise<void> {
@@ -9,6 +10,7 @@ async function main(): Promise<void> {
 
 	initProfileCheckout();
 	initSidebar();
+	initSearchField();
 }
 
 main();
