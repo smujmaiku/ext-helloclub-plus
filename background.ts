@@ -78,7 +78,7 @@ async function handlePeerData(data: unknown): Promise<void> {
 	console.log(type, payload);
 
 	switch (type) {
-		case 'scanValue':
+		case 'scan':
 			setScan(payload);
 		default:
 	}
@@ -119,7 +119,9 @@ chrome.action.onClicked.addListener((tab) => {
 
 	chrome.tabs.update(tab.id, {
 		url: `https://lmn.helloclub.com/admin/people/members?_q=${scanValue}`,
-	});
+	}).catch(console.error);
+
+	clearScan();
 });
 
 chrome.runtime.onStartup.addListener(() => {
