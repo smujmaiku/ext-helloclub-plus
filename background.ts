@@ -11,10 +11,10 @@ let scanTimer: NodeJS.Timeout;
 
 function updateIcon() {
 	const now = Date.now();
-	chrome.action.setTitle({ title: 'HelloClub Plus' });
+	chrome.action.setTitle({ title: TITLE });
 
 	if (scanValue) {
-		chrome.action.setTitle({ title: 'HelloClub Plus - Data' });
+		chrome.action.setTitle({ title: `${TITLE} - Data` });
 		chrome.action.setBadgeText({ text: '🪪' });
 		chrome.action.setBadgeBackgroundColor({
 			color: now % 300 > 100 ? '#34C' : '#A9E',
@@ -25,13 +25,13 @@ function updateIcon() {
 			color: '#3C4',
 		});
 	} else if (status === 'OPEN') {
-		chrome.action.setTitle({ title: 'HelloClub Plus - Connecting' });
+		chrome.action.setTitle({ title: `${TITLE} - Connecting` });
 		chrome.action.setBadgeText({ text: '~' });
 		chrome.action.setBadgeBackgroundColor({
 			color: '#ED1',
 		});
 	} else if (status === 'CLOSED') {
-		chrome.action.setTitle({ title: 'HelloClub Plus - Offline' });
+		chrome.action.setTitle({ title: `${TITLE} - Offline` });
 		chrome.action.setBadgeText({ text: 'x' });
 		chrome.action.setBadgeBackgroundColor({
 			color: '#C34',
