@@ -1,8 +1,10 @@
+import { PEERID_KEY } from './src/shared.ts';
+
 const OFFSCREEN_PATH = 'offscreen.html';
 
 const SCAN_EXPIRE_MS = 90_000;
 
-let status: 'PEER' | 'OPEN' | 'CLOSED' = 'CLOSED';
+let status: 'PEER' | 'OPEN' | 'CLOSED' | 'INACTIVE' = 'INACTIVE';
 let scanValue: string | undefined = undefined;
 let scanExpire = 0;
 let scanTimer: NodeJS.Timeout;
@@ -54,8 +56,10 @@ function clearScan() {
 }
 
 async function mountOffscreen(): Promise<void> {
-	const pid = 'badge-plus-change-me';
-	const offPath = `${OFFSCREEN_PATH}#${encodeURIComponent(pid)}`;
+	const { [PEERID_KEY]: pid } = await chrome.storage.local.get([PEERID_KEY])
+		.catch(console.error) || {};
+
+	const offPath = `${OFFSCREEN_PATH}#${encodeURIComponent(`${pid}`)}`;
 	const offUrl = chrome.runtime.getURL(offPath);
 
 	const [current] = await chrome.runtime.getContexts({
@@ -64,13 +68,18 @@ async function mountOffscreen(): Promise<void> {
 
 	const currentUrl = current?.documentUrl ?? null;
 	if (currentUrl === offUrl) return;
-	if (currentUrl) await chrome.offscreen.closeDocument();
+	if (currentUrl) {
+		status = 'INACTIVE';
+		await chrome.offscreen.closeDocument();
+	}
+	if (!pid) return;
 
 	await chrome.offscreen.createDocument({
 		url: offPath,
 		reasons: [chrome.offscreen.Reason.WEB_RTC],
 		justification: 'Connecting to optional scanValue scanner',
 	});
+	status = 'CLOSED';
 }
 
 async function handlePeerData(data: unknown): Promise<void> {
@@ -128,5 +137,12 @@ chrome.runtime.onStartup.addListener(() => {
 	mountOffscreen().catch(console.error);
 });
 chrome.runtime.onInstalled.addListener(() => {
+	mountOffscreen().catch(console.error);
+});
+chrome.runtime.onEnabled.addListener(() => {
+	mountOffscreen().catch(console.error);
+});
+
+chrome.storage.onChanged.addListener(() => {
 	mountOffscreen().catch(console.error);
 });

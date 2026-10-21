@@ -30,12 +30,18 @@
 			"run_at": "document_idle"
 		}
 	],
+	"options_ui": {
+		"page": "options.html",
+		"open_in_tab": false
+	},
 	"permissions": [
 		"activeTab",
-		"offscreen"
+		"offscreen",
+		"storage"
 	],
 	"action": {},
 	"host_permissions": [
+		"https://*.helloclub.com/*",
 		"https://api-v2.helloclub.com/*"
 	]
 }
