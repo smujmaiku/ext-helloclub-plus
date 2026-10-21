@@ -1,7 +1,7 @@
 import { PEERID_KEY } from './src/shared.ts';
 
+const TITLE = 'HelloClub Plus';
 const OFFSCREEN_PATH = 'offscreen.html';
-
 const SCAN_EXPIRE_MS = 90_000;
 
 let status: 'PEER' | 'OPEN' | 'CLOSED' | 'INACTIVE' = 'INACTIVE';
@@ -11,22 +11,31 @@ let scanTimer: NodeJS.Timeout;
 
 function updateIcon() {
 	const now = Date.now();
+	chrome.action.setTitle({ title: 'HelloClub Plus' });
 
 	if (scanValue) {
+		chrome.action.setTitle({ title: 'HelloClub Plus - Data' });
 		chrome.action.setBadgeText({ text: '🪪' });
 		chrome.action.setBadgeBackgroundColor({
-			color: now % 200 < 100 ? '#C34' : '#E32',
+			color: now % 300 > 100 ? '#34C' : '#A9E',
 		});
 	} else if (status === 'PEER') {
 		chrome.action.setBadgeText({ text: '✓' });
 		chrome.action.setBadgeBackgroundColor({
 			color: '#3C4',
 		});
-		// } else if (status === 'OPEN') {
-		// 	chrome.action.setBadgeText({ text: '?' });
-		// 	chrome.action.setBadgeBackgroundColor({
-		// 		color: '#ED1',
-		// 	});
+	} else if (status === 'OPEN') {
+		chrome.action.setTitle({ title: 'HelloClub Plus - Connecting' });
+		chrome.action.setBadgeText({ text: '~' });
+		chrome.action.setBadgeBackgroundColor({
+			color: '#ED1',
+		});
+	} else if (status === 'CLOSED') {
+		chrome.action.setTitle({ title: 'HelloClub Plus - Offline' });
+		chrome.action.setBadgeText({ text: 'x' });
+		chrome.action.setBadgeBackgroundColor({
+			color: '#C34',
+		});
 	} else {
 		chrome.action.setBadgeText({});
 		chrome.action.setBadgeBackgroundColor({
