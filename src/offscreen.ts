@@ -33,7 +33,7 @@ function openPeer() {
 		chrome.runtime.sendMessage({ type: 'PEER_CLOSE' });
 	};
 	const handlePeerError = (error: Error) => {
-		console.error(error);
+		console.log(error);
 		chrome.runtime.sendMessage({ type: 'PEER_ERROR', payload: error?.message });
 	};
 	tconn.on('open', handlePeerOpen);
@@ -59,7 +59,7 @@ const handleDisconnected = () => {
 	chrome.runtime.sendMessage({ type: 'DISCONNECTED' });
 };
 const handleError = (err: Error) => {
-	console.error(err);
+	console.log(err);
 	chrome.runtime.sendMessage({ type: 'ERROR' });
 };
 
