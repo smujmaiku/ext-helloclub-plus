@@ -1,11 +1,15 @@
+import z from '@zod/zod';
 import { PEERID_KEY } from './src/shared.ts';
 
 const TITLE = 'HelloClub Plus';
 const OFFSCREEN_PATH = 'offscreen.html';
 const SCAN_EXPIRE_MS = 90_000;
 
+const scanSchema = z.string().min(2).max(16);
+const SCAN_INVALID = new Error('Invalid Scan Data');
+
 let status: 'PEER' | 'OPEN' | 'CLOSED' | 'INACTIVE' = 'INACTIVE';
-let scanValue: string | undefined = undefined;
+let scanValue: string | Error | undefined = undefined;
 let scanExpire = 0;
 let scanTimer: NodeJS.Timeout;
 
@@ -13,8 +17,14 @@ function updateIcon() {
 	const now = Date.now();
 	chrome.action.setTitle({ title: TITLE });
 
-	if (scanValue) {
-		chrome.action.setTitle({ title: `${TITLE} - Data` });
+	if (scanValue === SCAN_INVALID) {
+		chrome.action.setTitle({ title: `${TITLE} - Invalid Data` });
+		chrome.action.setBadgeText({ text: '?' });
+		chrome.action.setBadgeBackgroundColor({
+			color: now % 300 > 100 ? '#34C' : '#A9E',
+		});
+	} else if (scanValue) {
+		chrome.action.setTitle({ title: `${TITLE} - ${scanValue}` });
 		chrome.action.setBadgeText({ text: '🪪' });
 		chrome.action.setBadgeBackgroundColor({
 			color: now % 300 > 100 ? '#34C' : '#A9E',
@@ -44,10 +54,15 @@ function updateIcon() {
 	}
 }
 
-function setScan(value: string) {
+function setScan(value: unknown) {
 	clearInterval(scanTimer);
 	scanExpire = Date.now() + SCAN_EXPIRE_MS;
-	scanValue = value;
+	try {
+		scanValue = scanSchema.parse(value);
+	} catch (_e) {
+		scanValue = SCAN_INVALID;
+	}
+
 	scanTimer = setInterval(() => {
 		if (Date.now() > scanExpire) {
 			clearScan();
@@ -128,7 +143,7 @@ chrome.runtime.onMessage.addListener((data, sender) => {
 });
 
 chrome.action.onClicked.addListener((tab) => {
-	if (!tab.id || !tab.url || !scanValue) return;
+	if (!tab.id || !tab.url || !scanValue || scanValue instanceof Error) return;
 	const url = new URL(tab.url);
 
 	const validHost = url.hostname.endsWith('.helloclub.com') &&
