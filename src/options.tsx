@@ -7,7 +7,7 @@ function Options() {
 	const [status, setStatus] = useState('');
 
 	useEffect(() => {
-		chrome.storage.local.get(['peerId']).then((data) => {
+		chrome.storage.local.get([PEERID_KEY]).then((data) => {
 			const { [PEERID_KEY]: pid } = data;
 			setPeerId(
 				typeof pid === 'string' ? pid : '',
