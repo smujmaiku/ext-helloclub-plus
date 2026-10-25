@@ -4,7 +4,10 @@ import webExtension from 'vite-plugin-web-extension';
 
 export default defineConfig({
 	plugins: [
-		webExtension({ disableAutoLaunch: true }),
+		webExtension({
+			disableAutoLaunch: true,
+			additionalInputs: ['offscreen.html'],
+		}),
 		deno(),
 	],
 	build: {

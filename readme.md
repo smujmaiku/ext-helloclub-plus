@@ -15,6 +15,13 @@ member is currently checked in, the button appears. Click it, they're out.
 A sidebar panel lists every member currently checked in, showing their name, how
 long they've been on-site, and a `Check out` button.
 
+### Badge scanner
+
+Connect to a
+[badge scanner over PeerJS](https://github.com/smujmaiku/esp-helloclub-plus).
+Set the scanner's peer id on the extension options page. When a badge is
+scanned, click the blinking icon to search for that user.
+
 ## Installation
 
 1. Clone this repo
