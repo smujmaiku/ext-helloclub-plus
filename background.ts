@@ -93,8 +93,9 @@ async function mountOffscreen(): Promise<void> {
 	const currentUrl = current?.documentUrl ?? null;
 	if (currentUrl === offUrl) return;
 	if (currentUrl) {
-		status = 'INACTIVE';
 		await chrome.offscreen.closeDocument();
+		status = 'INACTIVE';
+		updateIcon();
 	}
 	if (!pid) return;
 
@@ -104,6 +105,7 @@ async function mountOffscreen(): Promise<void> {
 		justification: 'Connecting to optional scanValue scanner',
 	});
 	status = 'CLOSED';
+	updateIcon();
 }
 
 async function handlePeerData(data: unknown): Promise<void> {
